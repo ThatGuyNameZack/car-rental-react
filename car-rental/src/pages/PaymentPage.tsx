@@ -2,6 +2,10 @@ import gopayLogo from '../assets/Gopay.png';
 import ovoLogo from '../assets/Ovo.png';
 import qrisLogo from '../assets/QRIS.png';
 import shopeeLogo from '../assets/Shopee.png';
+import bcaLogo from '../assets/BCA.png';
+import mandiriLogo from '../assets/MANDIRI.png';
+import bniLogo from '../assets/BNI.png';
+import briLogo from '../assets/BRI.png';
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -48,10 +52,10 @@ const PaymentPage: React.FC = () => {
   ];
 
   const banks = [
-    { id: 'bca', name: 'BCA', logo: '🏦' },
-    { id: 'mandiri', name: 'Mandiri', logo: '🏦' },
-    { id: 'bni', name: 'BNI', logo: '🏦' },
-    { id: 'bri', name: 'BRI', logo: '🏦' }
+    { id: 'bca', name: 'BCA', logo: bcaLogo },
+    { id: 'mandiri', name: 'Mandiri', logo: mandiriLogo },
+    { id: 'bni', name: 'BNI', logo: bniLogo },
+    { id: 'bri', name: 'BRI', logo: briLogo }
   ];
 
   const ewallets = [
@@ -222,7 +226,7 @@ const PaymentPage: React.FC = () => {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="text-3xl">{bank.logo}</div>
+                      <img src={bank.logo} alt={bank.name} className="w-10 h-10 object-contain" />
                       <div className="font-semibold">{bank.name}</div>
                     </button>
                   ))}

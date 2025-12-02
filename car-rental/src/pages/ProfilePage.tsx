@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, CreditCard, Shield, Lock, CheckCircle, AlertCircle, Eye, EyeOff, Plus, Trash2, Edit2 } from 'lucide-react';
 
 type TabType = 'personal' | 'cards' | 'verification' | 'security';
 
 const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [showPassword, setShowPassword] = useState(false);
 
