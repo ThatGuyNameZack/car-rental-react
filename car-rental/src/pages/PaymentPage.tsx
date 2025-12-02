@@ -1,9 +1,16 @@
+import gopayLogo from '../assets/Gopay.png';
+import ovoLogo from '../assets/Ovo.png';
+import qrisLogo from '../assets/QRIS.png';
+import shopeeLogo from '../assets/Shopee.png';
+
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CreditCard, Building2, Smartphone, Lock, CheckCircle, Calendar, MapPin, User, AlertCircle } from 'lucide-react';
 
 type PaymentMethod = 'card' | 'va' | 'ewallet';
 
 const PaymentPage: React.FC = () => {
+  const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [selectedBank, setSelectedBank] = useState('');
   const [selectedEwallet, setSelectedEwallet] = useState('');
@@ -48,10 +55,10 @@ const PaymentPage: React.FC = () => {
   ];
 
   const ewallets = [
-    { id: 'gopay', name: 'GoPay', logo: '💚' },
-    { id: 'ovo', name: 'OVO', logo: '💜' },
-    { id: 'dana', name: 'DANA', logo: '💙' },
-    { id: 'shopeepay', name: 'ShopeePay', logo: '🧡' }
+    { id: 'gopay', name: 'GoPay', logo: gopayLogo },
+    { id: 'ovo', name: 'OVO', logo: ovoLogo },
+    { id: 'QRIS', name: 'QRIS', logo: qrisLogo },
+    { id: 'shopeepay', name: 'ShopeePay', logo: shopeeLogo }
   ];
 
   return (
@@ -249,7 +256,7 @@ const PaymentPage: React.FC = () => {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="text-3xl">{wallet.logo}</div>
+                      <img src={wallet.logo} alt={wallet.name} className="w-10 h-10 object-contain" />
                       <div className="font-semibold">{wallet.name}</div>
                     </button>
                   ))}

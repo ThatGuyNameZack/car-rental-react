@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Car, Star, TrendingUp } from 'lucide-react';
 
 const Homepage: React.FC = () => {
+  const navigate = useNavigate();
   const [location, setLocation] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
@@ -45,22 +47,51 @@ const Homepage: React.FC = () => {
     { label: 'Rating Rata-rata', value: '4.8', icon: TrendingUp }
   ];
 
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (location) params.append('location', location);
+    if (pickupDate) params.append('pickupDate', pickupDate);
+    if (returnDate) params.append('returnDate', returnDate);
+    
+    navigate(`/listing?${params.toString()}`);
+  };
+
+  const handleCarClick = (carId: number) => {
+    navigate(`/car/${carId}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <div 
+              className="flex items-center space-x-2 cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               <Car className="w-8 h-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">RentalMobil.id</span>
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+              <button 
+                onClick={() => navigate('/')}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+              >
                 Beranda
               </button>
-              <button className="text-gray-600 hover:text-gray-900 font-medium">Riwayat</button>
-              <button className="text-gray-600 hover:text-gray-900 font-medium">Profile</button>
+              <button 
+                onClick={() => navigate('/history')}
+                className="text-gray-600 hover:text-gray-900 font-medium"
+              >
+                Riwayat
+              </button>
+              <button 
+                onClick={() => navigate('/profile')}
+                className="text-gray-600 hover:text-gray-900 font-medium"
+              >
+                Profile
+              </button>
             </nav>
           </div>
         </div>
@@ -126,7 +157,10 @@ const Homepage: React.FC = () => {
               </div>
             </div>
 
-            <button className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center space-x-2">
+            <button 
+              onClick={handleSearch}
+              className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center space-x-2"
+            >
               <Search className="w-5 h-5" />
               <span>Cari Mobil</span>
             </button>
@@ -157,7 +191,11 @@ const Homepage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredCars.map((car) => (
-            <div key={car.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer">
+            <div 
+              key={car.id} 
+              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
+              onClick={() => handleCarClick(car.id)}
+            >
               <div className="relative">
                 <img
                   src={car.image}
@@ -188,7 +226,13 @@ const Homepage: React.FC = () => {
                     </span>
                     <span className="text-gray-500 text-sm">/hari</span>
                   </div>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCarClick(car.id);
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                  >
                     Sewa
                   </button>
                 </div>

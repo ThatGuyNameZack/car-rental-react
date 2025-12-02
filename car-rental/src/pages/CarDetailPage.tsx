@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Star, Users, Settings, Fuel, MapPin, Shield, Calendar, Clock, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Star, Users, Settings, Fuel, MapPin, Shield, Calendar, Clock, Check, ChevronLeft, ChevronRight, ArrowLeft, Home } from 'lucide-react';
 
 const CarDetailPage: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [pickupDate, setPickupDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
@@ -51,6 +53,28 @@ const CarDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <button 
+              onClick={() => navigate(-1)}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+            >
+              <ArrowLeft className="w-6 h-6" />
+              <span>Kembali</span>
+            </button>
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+            >
+              <Home className="w-5 h-5" />
+              <span>Beranda</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
@@ -283,7 +307,10 @@ const CarDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition mb-3">
+              <button
+                onClick={() => navigate('/payment', { state: { car, pickupDate, returnDate, rentalDays, total } })}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition mb-3"
+              >
                 Pesan Sekarang
               </button>
 

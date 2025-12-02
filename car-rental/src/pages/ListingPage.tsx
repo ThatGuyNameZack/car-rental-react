@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Filter, Star, Users, Fuel, Settings, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Filter, Star, Users, Fuel, Settings, ArrowLeft, Home } from 'lucide-react';
 
 const ListingPage: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
@@ -108,8 +110,23 @@ const ListingPage: React.FC = () => {
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Pilih Mobil</h1>
             <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => navigate('/')}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+              >
+                <ArrowLeft className="w-6 h-6 text-gray-600" />
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900">Pilih Mobil</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => navigate('/')}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+              >
+                <Home className="w-5 h-5" />
+                <span className="hidden md:inline">Beranda</span>
+              </button>
               <span className="text-gray-600">{cars.length} mobil tersedia</span>
             </div>
           </div>
@@ -226,7 +243,11 @@ const ListingPage: React.FC = () => {
             {/* Car Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {cars.map(car => (
-                <div key={car.id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden cursor-pointer">
+                <div 
+                  key={car.id} 
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden cursor-pointer"
+                  onClick={() => navigate(`/car/${car.id}`)}
+                >
                   <div className="relative">
                     <img
                       src={car.image}
@@ -272,7 +293,13 @@ const ListingPage: React.FC = () => {
                         </span>
                         <span className="text-gray-500 text-sm">/hari</span>
                       </div>
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/car/${car.id}`);
+                        }}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                      >
                         Pilih
                       </button>
                     </div>
