@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, CreditCard, Shield, Lock, CheckCircle, AlertCircle, Eye, EyeOff, Plus, Trash2, Edit2 } from 'lucide-react';
+import { User, CreditCard, Shield, Lock, CheckCircle, AlertCircle, Eye, EyeOff, Plus, Trash2, Edit2, Home } from 'lucide-react';
 
 type TabType = 'personal' | 'cards' | 'verification' | 'security';
 
@@ -37,6 +37,15 @@ const ProfilePage: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+            >
+              <Home className="w-5 h-5" />
+              <span>Beranda</span>
+            </button>
+          </div>
           <div className="flex items-center space-x-4">
             <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
               JD

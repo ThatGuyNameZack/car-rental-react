@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Clock, Star, FileText, MessageCircle, XCircle } from 'lucide-react';
+import { Calendar, MapPin, Clock, Star, FileText, MessageCircle, XCircle, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type TabType = 'upcoming' | 'active' | 'completed';
 
@@ -20,6 +21,7 @@ interface Rental {
 }
 
 const RentalHistory: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('upcoming');
 
   const rentals: Rental[] = [
@@ -115,8 +117,17 @@ const RentalHistory: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Riwayat Sewa</h1>
-          <p className="text-gray-600 mt-1">Kelola dan pantau semua pesanan Anda</p>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">Riwayat Sewa</h1>
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+            >
+              <Home className="w-5 h-5" />
+              <span>Beranda</span>
+            </button>
+          </div>
+          <p className="text-gray-600">Kelola dan pantau semua pesanan Anda</p>
         </div>
       </header>
 

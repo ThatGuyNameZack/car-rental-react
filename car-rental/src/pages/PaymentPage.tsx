@@ -9,7 +9,7 @@ import briLogo from '../assets/BRI.png';
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Building2, Smartphone, Lock, CheckCircle, Calendar, MapPin, User, AlertCircle } from 'lucide-react';
+import { CreditCard, Building2, Smartphone, Lock, CheckCircle, Calendar, MapPin, User, AlertCircle, Home } from 'lucide-react';
 
 type PaymentMethod = 'card' | 'va' | 'ewallet';
 
@@ -67,10 +67,25 @@ const PaymentPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900">Pembayaran</h1>
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+            >
+              <Home className="w-5 h-5" />
+              <span>Beranda</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Pembayaran</h1>
-          <p className="text-gray-600 mt-1">Selesaikan pembayaran untuk konfirmasi pesanan Anda</p>
+          <p className="text-gray-600">Selesaikan pembayaran untuk konfirmasi pesanan Anda</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
