@@ -4,6 +4,7 @@ import Homepage from "./pages/Homepage";
 import ListingPage from "./pages/ListingPage";
 import CarDetailPage from "./pages/CarDetailPage";
 import PaymentPage from "./pages/PaymentPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import ProfilePage from "./pages/ProfilePage";
 import RentalHistory from "./pages/RentalHistory";
 
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
   { path: "/listing", element: <ListingPage /> },
   { path: "/car/:id", element: <CarDetailPage /> },
   { path: "/payment", element: <PaymentPage /> },
+  { path: "/payment/success", element: <PaymentSuccessPage /> },
   { path: "/profile", element: <ProfilePage /> },
   { path: "/history", element: <RentalHistory /> },
 ]);

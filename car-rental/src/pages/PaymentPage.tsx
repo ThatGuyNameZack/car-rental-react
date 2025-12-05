@@ -9,7 +9,7 @@ import briLogo from '../assets/BRI.png';
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Building2, Smartphone, Lock, CheckCircle, Calendar, MapPin, User, AlertCircle, Home } from 'lucide-react';
+import { CreditCard, Building2, Smartphone, Lock, CheckCircle, Calendar, MapPin, AlertCircle, Home } from 'lucide-react';
 
 type PaymentMethod = 'card' | 'va' | 'ewallet';
 
@@ -65,85 +65,90 @@ const PaymentPage: React.FC = () => {
     { id: 'shopeepay', name: 'ShopeePay', logo: shopeeLogo }
   ];
 
+  const handlePayment = () => {
+    // Simulate payment processing
+    navigate('/payment/success');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Pembayaran</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">Pembayaran</h1>
             <button 
               onClick={() => navigate('/')}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
+              className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 transition"
             >
-              <Home className="w-5 h-5" />
-              <span>Beranda</span>
+              <Home className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base">Beranda</span>
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <p className="text-gray-600">Selesaikan pembayaran untuk konfirmasi pesanan Anda</p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+        <div className="mb-4 sm:mb-6">
+          <p className="text-sm sm:text-base text-gray-600">Selesaikan pembayaran untuk konfirmasi pesanan Anda</p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
           {/* Payment Form */}
           <div className="flex-1">
             {/* Payment Method Selection */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Pilih Metode Pembayaran</h2>
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Pilih Metode Pembayaran</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <button
                   onClick={() => setPaymentMethod('card')}
-                  className={`p-4 border-2 rounded-lg transition ${
+                  className={`p-3 sm:p-4 border-2 rounded-lg transition ${
                     paymentMethod === 'card'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <CreditCard className={`w-8 h-8 mx-auto mb-2 ${
+                  <CreditCard className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 ${
                     paymentMethod === 'card' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
-                  <div className="font-semibold text-center">Kartu Kredit/Debit</div>
+                  <div className="font-semibold text-center text-xs sm:text-sm md:text-base">Kartu Kredit/Debit</div>
                 </button>
 
                 <button
                   onClick={() => setPaymentMethod('va')}
-                  className={`p-4 border-2 rounded-lg transition ${
+                  className={`p-3 sm:p-4 border-2 rounded-lg transition ${
                     paymentMethod === 'va'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <Building2 className={`w-8 h-8 mx-auto mb-2 ${
+                  <Building2 className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 ${
                     paymentMethod === 'va' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
-                  <div className="font-semibold text-center">Virtual Account</div>
+                  <div className="font-semibold text-center text-xs sm:text-sm md:text-base">Virtual Account</div>
                 </button>
 
                 <button
                   onClick={() => setPaymentMethod('ewallet')}
-                  className={`p-4 border-2 rounded-lg transition ${
+                  className={`p-3 sm:p-4 border-2 rounded-lg transition ${
                     paymentMethod === 'ewallet'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <Smartphone className={`w-8 h-8 mx-auto mb-2 ${
+                  <Smartphone className={`w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 ${
                     paymentMethod === 'ewallet' ? 'text-blue-600' : 'text-gray-400'
                   }`} />
-                  <div className="font-semibold text-center">E-Wallet</div>
+                  <div className="font-semibold text-center text-xs sm:text-sm md:text-base">E-Wallet</div>
                 </button>
               </div>
             </div>
 
             {/* Card Payment Form */}
             {paymentMethod === 'card' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Detail Kartu</h3>
+              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                <h3 className="font-bold text-gray-900 mb-4 text-base sm:text-lg">Detail Kartu</h3>
 
                 {/* Saved Cards */}
                 {savedCards.length > 0 && (
@@ -228,9 +233,9 @@ const PaymentPage: React.FC = () => {
 
             {/* Virtual Account */}
             {paymentMethod === 'va' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Pilih Bank</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                <h3 className="font-bold text-gray-900 mb-4 text-base sm:text-lg">Pilih Bank</h3>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {banks.map(bank => (
                     <button
                       key={bank.id}
@@ -262,9 +267,9 @@ const PaymentPage: React.FC = () => {
 
             {/* E-Wallet */}
             {paymentMethod === 'ewallet' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Pilih E-Wallet</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                <h3 className="font-bold text-gray-900 mb-4 text-base sm:text-lg">Pilih E-Wallet</h3>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {ewallets.map(wallet => (
                     <button
                       key={wallet.id}
@@ -295,10 +300,10 @@ const PaymentPage: React.FC = () => {
             )}
 
             {/* Security Notice */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mt-6">
-              <div className="flex items-center space-x-3">
-                <Lock className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <div className="text-sm text-gray-700">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 sm:p-4 mt-4 sm:mt-6">
+              <div className="flex items-start space-x-2 sm:space-x-3">
+                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="text-xs sm:text-sm text-gray-700">
                   <span className="font-semibold">Pembayaran Aman:</span> Semua transaksi dilindungi dengan enkripsi SSL 256-bit dan sesuai standar PCI DSS.
                 </div>
               </div>
@@ -307,15 +312,15 @@ const PaymentPage: React.FC = () => {
 
           {/* Order Summary - Sticky */}
           <aside className="lg:w-96 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg">Ringkasan Pesanan</h3>
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-8">
+              <h3 className="font-bold text-gray-900 mb-4 text-base sm:text-lg">Ringkasan Pesanan</h3>
 
               {/* Car Info */}
               <div className="mb-4 pb-4 border-b border-gray-200">
                 <img
                   src={orderDetails.car.image}
                   alt={`${orderDetails.car.brand} ${orderDetails.car.model}`}
-                  className="w-full h-32 object-cover rounded-lg mb-3"
+                  className="w-full h-32 sm:h-40 object-cover rounded-lg mb-3"
                 />
                 <div className="flex items-start justify-between">
                   <div>
@@ -362,15 +367,18 @@ const PaymentPage: React.FC = () => {
               </div>
 
               {/* Total */}
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-bold text-gray-900">Total Pembayaran</span>
-                <span className="text-2xl font-bold text-blue-600">Rp {total.toLocaleString('id-ID')}</span>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+                <span className="text-base sm:text-lg font-bold text-gray-900">Total Pembayaran</span>
+                <span className="text-xl sm:text-2xl font-bold text-blue-600">Rp {total.toLocaleString('id-ID')}</span>
               </div>
 
               {/* Payment Button */}
-              <button className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center space-x-2 mb-3">
-                <CheckCircle className="w-5 h-5" />
-                <span>Bayar Sekarang</span>
+              <button 
+                onClick={handlePayment}
+                className="w-full bg-blue-600 text-white py-3 sm:py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center space-x-2 mb-3"
+              >
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-sm sm:text-base">Bayar Sekarang</span>
               </button>
 
               <p className="text-xs text-gray-500 text-center">
