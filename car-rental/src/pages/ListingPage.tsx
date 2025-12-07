@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, Star, Users, Fuel, Settings, ArrowLeft, Home } from 'lucide-react';
+import { Filter, Star, Users, Fuel, Settings } from 'lucide-react';
+import Header from '../components/Header';
 
 const ListingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -106,32 +107,7 @@ const ListingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">Pilih Mobil</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
-              >
-                <Home className="w-5 h-5" />
-                <span className="hidden md:inline">Beranda</span>
-              </button>
-              <span className="text-gray-600">{cars.length} mobil tersedia</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">

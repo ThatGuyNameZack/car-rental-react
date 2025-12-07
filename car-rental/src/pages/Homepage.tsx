@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Car, Star, TrendingUp } from 'lucide-react';
+import Header from '../components/Header';
 
 const Homepage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,40 +63,7 @@ const Homepage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => navigate('/')}
-            >
-              <Car className="w-8 h-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">RentalMobil.id</span>
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => navigate('/')}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
-              >
-                Beranda
-              </button>
-              <button 
-                onClick={() => navigate('/history')}
-                className="text-gray-600 hover:text-gray-900 font-medium"
-              >
-                Riwayat
-              </button>
-              <button 
-                onClick={() => navigate('/profile')}
-                className="text-gray-600 hover:text-gray-900 font-medium"
-              >
-                Profile
-              </button>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white overflow-hidden">
