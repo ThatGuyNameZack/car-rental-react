@@ -7,6 +7,8 @@ import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import ProfilePage from "./pages/ProfilePage";
 import RentalHistory from "./pages/RentalHistory";
+import LoginPage from "./pages/loginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 const router = createBrowserRouter([
   { path: "/", element: <Homepage /> },
@@ -16,6 +18,8 @@ const router = createBrowserRouter([
   { path: "/payment/success", element: <PaymentSuccessPage /> },
   { path: "/profile", element: <ProfilePage /> },
   { path: "/history", element: <RentalHistory /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> }
 ]);
 
 export default function App() {

@@ -1,96 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Filter, Star, Users, Fuel, Settings, ArrowLeft, Home } from 'lucide-react';
+import { useCars } from '../hooks/useCars';
 
 const ListingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { cars, loading } = useCars();
+  
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
 
-  const brands = ['Toyota', 'Honda', 'Mitsubishi', 'Daihatsu', 'Suzuki', 'Nissan'];
-  const types = ['MPV', 'SUV', 'Sedan', 'Hatchback', 'Minibus'];
-
-  const cars = [
-    {
-      id: 1,
-      brand: 'Toyota',
-      model: 'Avanza',
-      type: 'MPV',
-      image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400',
-      rating: 4.5,
-      reviews: 128,
-      price: 350000,
-      seats: 7,
-      transmission: 'Manual',
-      fuel: 'Bensin'
-    },
-    {
-      id: 2,
-      brand: 'Honda',
-      model: 'Jazz',
-      type: 'Hatchback',
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400',
-      rating: 4.6,
-      reviews: 89,
-      price: 300000,
-      seats: 5,
-      transmission: 'Automatic',
-      fuel: 'Bensin'
-    },
-    {
-      id: 3,
-      brand: 'Mitsubishi',
-      model: 'Xpander',
-      type: 'MPV',
-      image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400',
-      rating: 4.7,
-      reviews: 95,
-      price: 400000,
-      seats: 7,
-      transmission: 'Automatic',
-      fuel: 'Bensin'
-    },
-    {
-      id: 4,
-      brand: 'Toyota',
-      model: 'Fortuner',
-      type: 'SUV',
-      image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400',
-      rating: 4.8,
-      reviews: 156,
-      price: 750000,
-      seats: 7,
-      transmission: 'Automatic',
-      fuel: 'Diesel'
-    },
-    {
-      id: 5,
-      brand: 'Honda',
-      model: 'CR-V',
-      type: 'SUV',
-      image: 'https://images.unsplash.com/photo-1511527844068-006b95d162c2?w=400',
-      rating: 4.7,
-      reviews: 142,
-      price: 650000,
-      seats: 7,
-      transmission: 'Automatic',
-      fuel: 'Bensin'
-    },
-    {
-      id: 6,
-      brand: 'Daihatsu',
-      model: 'Terios',
-      type: 'SUV',
-      image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400',
-      rating: 4.4,
-      reviews: 78,
-      price: 450000,
-      seats: 7,
-      transmission: 'Manual',
-      fuel: 'Bensin'
-    }
-  ];
+  const availableBrands = Array.from(new Set(cars.map(c => c.brand)));
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands(prev => 
@@ -98,36 +18,31 @@ const ListingPage: React.FC = () => {
     );
   };
 
-  const toggleType = (type: string) => {
-    setSelectedTypes(prev => 
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    );
-  };
+  const filteredCars = cars.filter(car => {
+    const matchBrand = selectedBrands.length === 0 || selectedBrands.includes(car.brand);
+    const matchPrice = car.price_per_day <= priceRange[1];
+    return matchBrand && matchPrice;
+  });
+
+  if (loading) return <div className="p-10 text-center">Memuat data mobil...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
-              >
+              <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded-lg transition">
                 <ArrowLeft className="w-6 h-6 text-gray-600" />
               </button>
               <h1 className="text-2xl font-bold text-gray-900">Pilih Mobil</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/')}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition"
-              >
+              <button onClick={() => navigate('/')} className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition">
                 <Home className="w-5 h-5" />
                 <span className="hidden md:inline">Beranda</span>
               </button>
-              <span className="text-gray-600">{cars.length} mobil tersedia</span>
+              <span className="text-gray-600">{filteredCars.length} mobil tersedia</span>
             </div>
           </div>
         </div>
@@ -143,14 +58,19 @@ const ListingPage: React.FC = () => {
                   <Filter className="w-5 h-5 mr-2" />
                   Filter Mobil
                 </h2>
-                <button className="text-blue-600 text-sm hover:text-blue-700">Reset</button>
+                <button 
+                  onClick={() => {setSelectedBrands([]); setPriceRange([0, 2000000]);}}
+                  className="text-blue-600 text-sm hover:text-blue-700"
+                >
+                  Reset
+                </button>
               </div>
 
               {/* Brand Filter */}
               <div className="mb-6">
                 <h3 className="font-semibold text-gray-900 mb-3">Merek</h3>
                 <div className="space-y-2">
-                  {brands.map(brand => (
+                  {availableBrands.map(brand => (
                     <label key={brand} className="flex items-center cursor-pointer group">
                       <input
                         type="checkbox"
@@ -164,33 +84,15 @@ const ListingPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Type Filter */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Tipe</h3>
-                <div className="space-y-2">
-                  {types.map(type => (
-                    <label key={type} className="flex items-center cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={selectedTypes.includes(type)}
-                        onChange={() => toggleType(type)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <span className="ml-3 text-gray-700 group-hover:text-gray-900">{type}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
               {/* Price Range */}
               <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Harga Per Hari</h3>
+                <h3 className="font-semibold text-gray-900 mb-3">Harga Maksimal</h3>
                 <div className="space-y-3">
                   <input
                     type="range"
                     min="0"
-                    max="1000000"
-                    step="50000"
+                    max="2000000"
+                    step="100000"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
                     className="w-full"
@@ -203,46 +105,13 @@ const ListingPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Transmission */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Transmisi</h3>
-                <div className="space-y-2">
-                  <label className="flex items-center cursor-pointer group">
-                    <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                    <span className="ml-3 text-gray-700 group-hover:text-gray-900">Manual</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer group">
-                    <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                    <span className="ml-3 text-gray-700 group-hover:text-gray-900">Automatic</span>
-                  </label>
-                </div>
-              </div>
-
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-                Terapkan Filter
-              </button>
             </div>
           </aside>
 
           {/* Car Grid */}
           <main className="flex-1">
-            {/* Sort Options */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Urutkan berdasarkan:</span>
-                <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option>Harga Terendah</option>
-                  <option>Harga Tertinggi</option>
-                  <option>Rating Tertinggi</option>
-                  <option>Paling Populer</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Car Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {cars.map(car => (
+              {filteredCars.map(car => (
                 <div 
                   key={car.id} 
                   className="bg-white rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden cursor-pointer"
@@ -250,7 +119,7 @@ const ListingPage: React.FC = () => {
                 >
                   <div className="relative">
                     <img
-                      src={car.image}
+                      src={car.image_urls[0]}
                       alt={`${car.brand} ${car.model}`}
                       className="w-full h-48 object-cover"
                     />
@@ -289,15 +158,11 @@ const ListingPage: React.FC = () => {
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div>
                         <span className="text-xl font-bold text-blue-600">
-                          Rp {car.price.toLocaleString('id-ID')}
+                          Rp {car.price_per_day.toLocaleString('id-ID')}
                         </span>
                         <span className="text-gray-500 text-sm">/hari</span>
                       </div>
                       <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/car/${car.id}`);
-                        }}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
                       >
                         Pilih

@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, CreditCard, Shield, Lock, CheckCircle, AlertCircle, Eye, EyeOff, Plus, Trash2, Edit2, Home } from 'lucide-react';
+import { signOut } from 'firebase/auth'; 
+import { auth } from '../firebaseConfig';
+import { User, CreditCard, Shield, Lock, CheckCircle, AlertCircle, Eye, EyeOff, Plus, Trash2, Edit2, Home, LogOut } from 'lucide-react';
+import { useAuthAndProfile, useSavedCards } from '../hooks/useUser';
 
 type TabType = 'personal' | 'cards' | 'verification' | 'security';
 
@@ -9,28 +12,59 @@ const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('personal');
   const [showPassword, setShowPassword] = useState(false);
 
-  const userStats = {
-    totalRentals: 12,
-    activeRentals: 1,
-    totalSpent: 8500000
+  const { firebaseUser, userProfile, loading: loadingAuth } = useAuthAndProfile();
+  const { cards: savedCards, loading: loadingCards } = useSavedCards(firebaseUser?.uid);
+
+  const [localProfile, setLocalProfile] = useState({
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    address: '',
+    dob: ''
+  });
+
+  useEffect(() => {
+    if (userProfile) {
+      setLocalProfile({
+        fullName: userProfile.fullName || 'N/A',
+        email: userProfile.email || 'N/A',
+        phoneNumber: userProfile.phoneNumber || '',
+        address: (userProfile as any).address || '',
+        dob: (userProfile as any).date_of_birth || ''
+      });
+    }
+  }, [userProfile]);
+
+  const handleSaveProfile = () => {
+    if (!firebaseUser) return;
+    console.log("Saving profile changes:", localProfile);
   };
 
-  const savedCards = [
-    {
-      id: '1',
-      type: 'Visa',
-      last4: '4242',
-      expiry: '12/25',
-      isDefault: true
-    },
-    {
-      id: '2',
-      type: 'Mastercard',
-      last4: '8888',
-      expiry: '09/26',
-      isDefault: false
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error("Gagal logout:", error);
     }
-  ];
+  };
+
+  if (loadingAuth || loadingCards) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Memuat Profil...</div>;
+  }
+
+  if (!firebaseUser || !userProfile) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Anda harus login untuk melihat halaman ini.</div>;
+  }
+
+  const displayEmail = firebaseUser.email || 'N/A';
+  const displayFullName = userProfile.fullName || 'Pengguna';
+  const userStats = {
+    totalRentals: userProfile.totalRentals,
+    totalSpent: userProfile.totalSpent
+  };
+  const isVerified = (userProfile.verificationStatus as any)?.ktp === 'verified';
+  const verificationStatus = userProfile.verificationStatus || {};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,24 +79,28 @@ const ProfilePage: React.FC = () => {
               <Home className="w-5 h-5" />
               <span>Beranda</span>
             </button>
+            <button 
+              onClick={handleLogout}
+              className="md:hidden text-red-600 font-medium text-sm"
+            >
+              Keluar
+            </button>
           </div>
           <div className="flex items-center space-x-4">
             <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-              JD
+              {displayFullName.charAt(0)}
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Welt Yang</h1>
-              <p className="text-gray-600">welt.spacefan@email.com</p>
+              <h1 className="text-3xl font-bold text-gray-900">{displayFullName}</h1>
+              <p className="text-gray-600">{displayEmail}</p>
               <div className="flex items-center space-x-4 mt-2 text-sm">
                 <span className="text-gray-600">
                   <strong>{userStats.totalRentals}</strong> Total Sewa
                 </span>
                 <span className="text-gray-400">•</span>
-                <span className="text-gray-600">
-                  <strong>{userStats.activeRentals}</strong> Aktif
+                <span className={`font-semibold ${isVerified ? 'text-green-600' : 'text-yellow-600'}`}>
+                  {isVerified ? 'Member Verified' : 'Perlu Verifikasi'}
                 </span>
-                <span className="text-gray-400">•</span>
-                <span className="text-green-600 font-semibold">Member Verified</span>
               </div>
             </div>
           </div>
@@ -121,6 +159,15 @@ const ProfilePage: React.FC = () => {
                 <Lock className="w-5 h-5" />
                 <span className="font-medium">Keamanan</span>
               </button>
+              <div className="border-t border-gray-100 mt-2">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 px-6 py-4 text-red-600 hover:bg-red-50 transition"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Keluar Akun</span>
+                </button>
+              </div>
             </div>
 
             {/* Stats Card */}
@@ -130,12 +177,6 @@ const ProfilePage: React.FC = () => {
                 <div>
                   <div className="text-2xl font-bold">{userStats.totalRentals}</div>
                   <div className="text-blue-100 text-sm">Total Penyewaan</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">
-                    Rp {(userStats.totalSpent / 1000000).toFixed(1)}jt
-                  </div>
-                  <div className="text-blue-100 text-sm">Total Pengeluaran</div>
                 </div>
               </div>
             </div>
@@ -153,7 +194,8 @@ const ProfilePage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
                     <input
                       type="text"
-                      defaultValue="John Doe"
+                      value={localProfile.fullName}
+                      onChange={(e) => setLocalProfile({...localProfile, fullName: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -162,8 +204,10 @@ const ProfilePage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
                       type="email"
-                      defaultValue="john.doe@email.com"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={localProfile.email}
+                      onChange={(e) => setLocalProfile({...localProfile, email: e.target.value})}
+                      disabled
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100"
                     />
                   </div>
 
@@ -171,7 +215,8 @@ const ProfilePage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
                     <input
                       type="tel"
-                      defaultValue="+62 812 3456 7890"
+                      value={localProfile.phoneNumber}
+                      onChange={(e) => setLocalProfile({...localProfile, phoneNumber: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -180,7 +225,8 @@ const ProfilePage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir</label>
                     <input
                       type="date"
-                      defaultValue="1990-01-15"
+                      value={localProfile.dob}
+                      onChange={(e) => setLocalProfile({...localProfile, dob: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -189,14 +235,18 @@ const ProfilePage: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
                     <textarea
                       rows={3}
-                      defaultValue="Jl. Sudirman No. 123, Jakarta Pusat 10110"
+                      value={localProfile.address}
+                      onChange={(e) => setLocalProfile({...localProfile, address: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
 
                 <div className="flex justify-end mt-6">
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                  <button 
+                    onClick={handleSaveProfile}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                  >
                     Simpan Perubahan
                   </button>
                 </div>
@@ -214,38 +264,45 @@ const ProfilePage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  {savedCards.map(card => (
-                    <div key={card.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-bold">
-                            {card.type === 'Visa' ? 'V' : 'M'}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-gray-900">
-                              {card.type} •••• {card.last4}
+                {loadingCards ? (
+                  <div className="text-center py-4 text-gray-600">Memuat kartu...</div>
+                ) : savedCards.length === 0 ? (
+                  <div className="text-center py-4 text-gray-600">Anda belum menyimpan kartu.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {savedCards.map(card => (
+                      <div key={card.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center text-white font-bold">
+                              {card.type === 'Visa' ? 'V' : 'M'}
                             </div>
-                            <div className="text-sm text-gray-600">Berlaku hingga {card.expiry}</div>
+                            <div>
+                              <div className="font-semibold text-gray-900">
+                                {card.type} •••• {card.last4}
+                              </div>
+                              <div className="text-sm text-gray-600">Berlaku hingga {card.expiry}</div>
+                            </div>
+                            {card.isDefault && (
+                              <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded">
+                                Default
+                              </span>
+                            )}
                           </div>
-                          {card.isDefault && (
-                            <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded">
-                              Default
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
-                            <Edit2 className="w-5 h-5" />
-                          </button>
-                          <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+                          <div className="flex items-center space-x-2">
+                            <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                              <Edit2 className="w-5 h-5" />
+                            </button>
+                            <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
+
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
                   <div className="flex items-start space-x-3">
@@ -266,12 +323,19 @@ const ProfilePage: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        (verificationStatus.ktp === 'verified') ? 'bg-green-100' : 'bg-yellow-100'
+                      }`}>
+                        {(verificationStatus.ktp === 'verified') ? 
+                          <CheckCircle className="w-6 h-6 text-green-600" /> : 
+                          <AlertCircle className="w-6 h-6 text-yellow-600" />
+                        }
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">KTP</h3>
-                        <p className="text-sm text-green-600">Terverifikasi</p>
+                        <p className={`text-sm ${
+                          (verificationStatus.ktp === 'verified') ? 'text-green-600' : 'text-yellow-600'
+                        }`}>{(verificationStatus.ktp === 'verified') ? 'Terverifikasi' : 'Belum Terverifikasi'}</p>
                       </div>
                     </div>
                     <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
@@ -280,7 +344,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="text-sm text-gray-700">
-                      <div>No. KTP: 3175••••••••1234</div>
+                      <div>No. KTP: {(verificationStatus.ktp === 'verified') ? '3175••••••••1234' : 'N/A'}</div>
                       <div className="text-gray-500 mt-1">Diverifikasi pada 15 Nov 2024</div>
                     </div>
                   </div>
@@ -290,12 +354,19 @@ const ProfilePage: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-6 h-6 text-green-600" />
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        (verificationStatus.sim === 'verified') ? 'bg-green-100' : 'bg-yellow-100'
+                      }`}>
+                        {(verificationStatus.sim === 'verified') ? 
+                          <CheckCircle className="w-6 h-6 text-green-600" /> : 
+                          <AlertCircle className="w-6 h-6 text-yellow-600" />
+                        }
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">SIM A</h3>
-                        <p className="text-sm text-green-600">Terverifikasi</p>
+                        <p className={`text-sm ${
+                          (verificationStatus.sim === 'verified') ? 'text-green-600' : 'text-yellow-600'
+                        }`}>{(verificationStatus.sim === 'verified') ? 'Terverifikasi' : 'Belum Terverifikasi'}</p>
                       </div>
                     </div>
                     <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
@@ -304,7 +375,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="text-sm text-gray-700">
-                      <div>No. SIM: 1234567890123456</div>
+                      <div>No. SIM: {(verificationStatus.sim === 'verified') ? '1234567890123456' : 'N/A'}</div>
                       <div className="text-gray-500 mt-1">Berlaku hingga 20 Jan 2027</div>
                     </div>
                   </div>
@@ -314,21 +385,37 @@ const ProfilePage: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                        <AlertCircle className="w-6 h-6 text-yellow-600" />
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        (verificationStatus.face === 'verified') ? 'bg-green-100' : 'bg-yellow-100'
+                      }`}>
+                        {(verificationStatus.face === 'verified') ? 
+                          <CheckCircle className="w-6 h-6 text-green-600" /> : 
+                          <AlertCircle className="w-6 h-6 text-yellow-600" />
+                        }
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">Verifikasi Wajah</h3>
-                        <p className="text-sm text-yellow-600">Menunggu Verifikasi</p>
+                        <p className={`text-sm ${
+                          (verificationStatus.face === 'verified') ? 'text-green-600' : 'text-yellow-600'
+                        }`}>{(verificationStatus.face === 'verified') ? 'Terverifikasi' : 'Menunggu Verifikasi'}</p>
                       </div>
                     </div>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
-                      Upload Foto
-                    </button>
+                    {(verificationStatus.face !== 'verified') && (
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+                        Upload Foto
+                      </button>
+                    )}
                   </div>
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <p className="text-sm text-yellow-800">
-                      Verifikasi wajah diperlukan untuk meningkatkan keamanan akun Anda. Proses ini memakan waktu 1-2 hari kerja.
+                  <div className={`rounded-lg p-4 ${
+                    (verificationStatus.face !== 'verified') ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200'
+                  }`}>
+                    <p className={`text-sm ${
+                      (verificationStatus.face !== 'verified') ? 'text-yellow-800' : 'text-green-800'
+                    }`}>
+                      {(verificationStatus.face !== 'verified') ? 
+                        'Verifikasi wajah diperlukan untuk meningkatkan keamanan akun Anda. Proses ini memakan waktu 1-2 hari kerja.' :
+                        'Verifikasi wajah Anda telah berhasil.'
+                      }
                     </p>
                   </div>
                 </div>

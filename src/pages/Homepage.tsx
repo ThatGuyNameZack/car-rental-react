@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, Car, Star, TrendingUp } from 'lucide-react';
+import { Search, MapPin, Calendar, Car, Star, TrendingUp, LogIn, UserPlus } from 'lucide-react';
+import { useFeaturedCars } from '../hooks/useCars';
+import { useAuthAndProfile } from '../hooks/useUser';
 
 const Homepage: React.FC = () => {
   const navigate = useNavigate();
@@ -8,38 +10,8 @@ const Homepage: React.FC = () => {
   const [pickupDate, setPickupDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
 
-  const featuredCars = [
-    {
-      id: 1,
-      brand: 'Toyota',
-      model: 'Avanza',
-      image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400',
-      rating: 4.5,
-      reviews: 128,
-      price: 350000,
-      type: 'MPV'
-    },
-    {
-      id: 2,
-      brand: 'Honda',
-      model: 'Jazz',
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400',
-      rating: 4.6,
-      reviews: 89,
-      price: 300000,
-      type: 'Hatchback'
-    },
-    {
-      id: 3,
-      brand: 'Mitsubishi',
-      model: 'Xpander',
-      image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400',
-      rating: 4.7,
-      reviews: 95,
-      price: 400000,
-      type: 'MPV'
-    }
-  ];
+  const { firebaseUser, loading: loadingAuth } = useAuthAndProfile();
+  const { cars: featuredCars, loading: loadingCars } = useFeaturedCars();
 
   const stats = [
     { label: 'Mobil Tersedia', value: '500+', icon: Car },
@@ -56,14 +28,13 @@ const Homepage: React.FC = () => {
     navigate(`/listing?${params.toString()}`);
   };
 
-  const handleCarClick = (carId: number) => {
+  const handleCarClick = (carId: string) => {
     navigate(`/car/${carId}`);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div 
@@ -73,25 +44,52 @@ const Homepage: React.FC = () => {
               <Car className="w-8 h-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">RentalMobil.id</span>
             </div>
-            <nav className="hidden md:flex items-center space-x-8">
+
+            <nav className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={() => navigate('/')}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                className="text-gray-600 hover:text-blue-600 font-medium transition"
               >
                 Beranda
               </button>
-              <button 
-                onClick={() => navigate('/history')}
-                className="text-gray-600 hover:text-gray-900 font-medium"
-              >
-                Riwayat
-              </button>
-              <button 
-                onClick={() => navigate('/profile')}
-                className="text-gray-600 hover:text-gray-900 font-medium"
-              >
-                Profile
-              </button>
+
+              {!loadingAuth && (
+                <>
+                  {firebaseUser ? (
+                    <>
+                      <button 
+                        onClick={() => navigate('/history')}
+                        className="text-gray-600 hover:text-blue-600 font-medium transition"
+                      >
+                        Riwayat
+                      </button>
+                      <button 
+                        onClick={() => navigate('/profile')}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center space-x-2"
+                      >
+                        <span>Akun Saya</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => navigate('/login')}
+                        className="flex items-center space-x-1 text-gray-600 hover:text-blue-600 font-medium transition px-4 py-2"
+                      >
+                        <LogIn className="w-4 h-4" />
+                        <span>Masuk</span>
+                      </button>
+                      <button 
+                        onClick={() => navigate('/register')}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center space-x-2 shadow-lg shadow-blue-200"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        <span>Daftar</span>
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
             </nav>
           </div>
         </div>
@@ -106,14 +104,16 @@ const Homepage: React.FC = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Sewa Mobil Mudah & Terpercaya
+              {firebaseUser 
+                ? `Halo, Selamat Datang Kembali!` 
+                : "Sewa Mobil Mudah & Terpercaya"
+              }
             </h1>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto">
               Temukan mobil impian Anda dengan harga terbaik. Ribuan pilihan mobil dari berbagai merek dan tipe.
             </p>
           </div>
 
-          {/* Search Form */}
           <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div>
@@ -166,7 +166,6 @@ const Homepage: React.FC = () => {
             </button>
           </div>
 
-          {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
@@ -189,57 +188,63 @@ const Homepage: React.FC = () => {
           <p className="text-gray-600">Koleksi mobil terbaik dengan harga terjangkau</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredCars.map((car) => (
-            <div 
-              key={car.id} 
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
-              onClick={() => handleCarClick(car.id)}
-            >
-              <div className="relative">
-                <img
-                  src={car.image}
-                  alt={`${car.brand} ${car.model}`}
-                  className="w-full h-48 object-cover"
-                />
-                <span className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  {car.type}
-                </span>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-gray-900">{car.brand}</h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold text-gray-900">{car.rating}</span>
-                    <span className="text-gray-500 text-sm">({car.reviews})</span>
-                  </div>
+        {loadingCars && (
+          <div className="text-center py-10 text-gray-600">Memuat data mobil...</div>
+        )}
+
+        {!loadingCars && featuredCars.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredCars.map((car) => (
+              <div 
+                key={car.id} 
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition cursor-pointer"
+                onClick={() => handleCarClick(car.id)}
+              >
+                <div className="relative">
+                  <img
+                    src={car.image_urls[0]}
+                    alt={`${car.brand} ${car.model}`}
+                    className="w-full h-48 object-cover"
+                  />
+                  <span className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {car.type}
+                  </span>
                 </div>
                 
-                <p className="text-gray-600 mb-4">{car.model}</p>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-blue-600">
-                      Rp {car.price.toLocaleString('id-ID')}
-                    </span>
-                    <span className="text-gray-500 text-sm">/hari</span>
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xl font-bold text-gray-900">{car.brand}</h3>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold text-gray-900">{car.rating}</span>
+                      <span className="text-gray-500 text-sm">({car.reviews})</span>
+                    </div>
                   </div>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCarClick(car.id);
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                  >
-                    Sewa
-                  </button>
+                  
+                  <p className="text-gray-600 mb-4">{car.model}</p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-2xl font-bold text-blue-600">
+                        Rp {car.price_per_day.toLocaleString('id-ID')}
+                      </span>
+                      <span className="text-gray-500 text-sm">/hari</span>
+                    </div>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCarClick(car.id);
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Sewa
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
