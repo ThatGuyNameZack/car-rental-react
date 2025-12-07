@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CreditCard, Home, CheckCircle } from 'lucide-react';
 import { useAuthAndProfile } from '../hooks/useUser';
@@ -16,7 +16,7 @@ const PaymentPage: React.FC = () => {
     return <div className="p-10 text-center">Data pesanan tidak ditemukan. Silakan pilih mobil kembali.</div>;
   }
 
-  const { car, pickupDate, returnDate, rentalDays, total, insurance, location: pickupLocation } = bookingData;
+  const { car, pickupDate, returnDate, total, location: pickupLocation } = bookingData;
 
   const handlePayment = async () => {
     if (!firebaseUser) {
